@@ -565,7 +565,7 @@ function initMini(){
 
 // ── VARDİYA MESAJI ────────────────────────────────────────────
 function loadVardiya(){
-  fetch('https://mx-hub-36e72-default-rtdb.firebaseio.com/vardiya.json')
+  fetch('https://lastik-hub-default-rtdb.firebaseio.com//vardiya.json')
     .then(r=>r.json())
     .then(data=>{
       if(data && data.mesaj && data.aktif){
@@ -580,7 +580,7 @@ function openVardiya(){
   const mesaj = prompt('Vardiya mesajı (boş bırakırsan kapatılır):',
     document.getElementById('vardiyaText').textContent || '');
   if(mesaj === null) return;
-  fetch('https://mx-hub-36e72-default-rtdb.firebaseio.com/vardiya.json', {
+  fetch('https://lastik-hub-default-rtdb.firebaseio.com//vardiya.json', {
     method:'PUT',
     body: JSON.stringify({mesaj: mesaj.trim(), aktif: mesaj.trim().length > 0, tarih: new Date().toLocaleString('tr-TR')})
   }).then(()=>{
@@ -650,7 +650,7 @@ async function checkAdminPw() {
 function showAdminPanel() {
   document.getElementById('adminLogin').classList.add('hide');
   document.getElementById('adminPanel').classList.add('show');
-  fetch('https://mx-hub-36e72-default-rtdb.firebaseio.com/notes.json')
+  fetch('https://lastik-hub-default-rtdb.firebaseio.com//notes.json')
     .then(r => r.json())
     .then(data => {
       const notes = data ? Object.values(data) : [];
@@ -702,7 +702,7 @@ function adminBackupCSV() {
 function adminClearAll() {
   if (!confirm('TÜM NOTLAR SİLİNECEK! Emin misiniz?')) return;
   if (!confirm('Bu işlem geri alınamaz. Devam?')) return;
-  fetch('https://mx-hub-36e72-default-rtdb.firebaseio.com/notes.json', {method: 'DELETE'})
+  fetch('https://lastik-hub-default-rtdb.firebaseio.com//notes.json', {method: 'DELETE'})
     .then(() => { showHubToast('🗑 Tüm notlar silindi'); closeAdmin(); })
     .catch(() => alert('Silme hatası'));
 }
