@@ -1,0 +1,1742 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Turkish Airlines — Current Fleet</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #E31837;
+    --dark: #0a0a0a;
+    --surface: #111111;
+    --card: #181818;
+    --border: #2a2a2a;
+    --text: #e8e8e8;
+    --muted: #777;
+    --accent: #E31837;
+    --gold: #c9a84c;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--dark);
+    border-bottom: 2px solid var(--red);
+    padding: 0 32px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo-tulip {
+    width: 36px;
+    height: 36px;
+  }
+
+  .logo-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 3px;
+    color: var(--text);
+  }
+
+  .logo-text span { color: var(--red); }
+
+  .header-stats {
+    display: flex;
+    gap: 32px;
+  }
+
+  .stat-item {
+    text-align: right;
+  }
+
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    color: var(--red);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  /* CONTROLS */
+  .controls {
+    padding: 20px 32px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .search-box {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+    max-width: 320px;
+  }
+
+  .search-box input {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px 8px 36px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-box input:focus { border-color: var(--red); }
+
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .filter-group {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 6px 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--red);
+    border-color: var(--red);
+    color: #fff;
+  }
+
+  .result-count {
+    margin-left: auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .result-count span { color: var(--red); font-weight: 600; }
+
+  /* TABLE */
+  .table-wrapper {
+    overflow-x: auto;
+    padding: 0 32px 40px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  thead th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    background: var(--surface);
+    position: sticky;
+    top: 64px;
+  }
+
+  thead th:hover { color: var(--red); }
+  thead th.sorted { color: var(--red); }
+
+  tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.1s;
+  }
+
+  tbody tr:hover { background: rgba(227,24,55,0.06); }
+
+  tbody td {
+    padding: 9px 14px;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  .reg {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--red);
+    letter-spacing: 1px;
+  }
+
+  .aircraft-type {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .config-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    padding: 2px 7px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+
+  .delivered {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: #888;
+  }
+
+  .remark {
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .remark.maintenance { color: #e8a020; }
+  .remark.parked { color: #e8a020; }
+  .remark.cargo { color: #5b9bd5; }
+  .remark.special { color: var(--gold); }
+  .remark.order { color: #888; }
+
+  .aircraft-name {
+    font-size: 12px;
+    color: #aaa;
+  }
+
+  .age-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 110px;
+  }
+
+  .age-val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 52px;
+    text-align: right;
+  }
+
+  .age-bar {
+    height: 3px;
+    background: var(--border);
+    flex: 1;
+    min-width: 50px;
+    position: relative;
+  }
+
+  .age-fill {
+    height: 100%;
+    background: var(--red);
+    transition: width 0.3s;
+  }
+
+  /* TYPE CATEGORY ROWS */
+  .type-header {
+    background: var(--surface);
+  }
+
+  .type-header td {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    letter-spacing: 3px;
+    color: var(--red);
+    padding: 14px 14px 6px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ON ORDER */
+  tbody tr.on-order td { opacity: 0.5; }
+  tbody tr.on-order .reg { color: var(--muted); }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--muted);
+    font-size: 11px;
+    border-top: 1px solid var(--border);
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.5px;
+  }
+
+  footer span { color: var(--red); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--dark); }
+  ::-webkit-scrollbar-thumb { background: var(--border); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--red); }
+
+  /* PHOTO PANEL */
+  .panel-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+    backdrop-filter: blur(2px);
+  }
+  .panel-overlay.open { opacity: 1; pointer-events: all; }
+
+  .photo-panel {
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    width: 380px;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    z-index: 201;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .photo-panel.open { transform: translateX(0); }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    background: var(--card);
+  }
+
+  .panel-reg {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--red);
+    letter-spacing: 2px;
+  }
+
+  .panel-close {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    width: 32px; height: 32px;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .panel-close:hover { border-color: var(--red); color: var(--red); }
+
+  .panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+  }
+
+  /* Main photo */
+  .panel-photo-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #000;
+    overflow: hidden;
+  }
+
+  .panel-photo-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: opacity 0.3s;
+  }
+
+  .panel-photo-credit {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    padding: 20px 12px 8px;
+    font-size: 10px;
+    color: rgba(255,255,255,0.7);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .panel-photo-credit a {
+    color: var(--red);
+    text-decoration: none;
+  }
+
+  /* Photo grid (thumbnails) */
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    padding: 2px;
+    background: var(--dark);
+  }
+
+  .photo-thumb {
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+  }
+
+  .photo-thumb:hover, .photo-thumb.active { opacity: 1; }
+  .photo-thumb.active::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 2px solid var(--red);
+  }
+
+  .photo-thumb img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Aircraft info */
+  .panel-info {
+    padding: 16px 20px;
+  }
+
+  .panel-aircraft-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .panel-type {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .info-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 10px 12px;
+  }
+
+  .info-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .info-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .info-value.red { color: var(--red); }
+  .info-value.gold { color: var(--gold); }
+
+  /* Planespotters link */
+  .panel-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 20px 16px;
+    padding: 10px 14px;
+    background: rgba(227,24,55,0.08);
+    border: 1px solid rgba(227,24,55,0.2);
+    color: var(--red);
+    text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    transition: background 0.15s;
+  }
+  .panel-link:hover { background: rgba(227,24,55,0.15); }
+
+  /* Loading / error states */
+  .panel-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 20px;
+    gap: 16px;
+  }
+
+  .spinner {
+    width: 32px; height: 32px;
+    border: 2px solid var(--border);
+    border-top-color: var(--red);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .panel-loading-text {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .panel-no-photo {
+    padding: 32px 20px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .panel-no-photo .no-photo-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+    opacity: 0.3;
+  }
+
+  /* Clickable rows */
+  tbody tr:not(.type-header):not(.on-order) { cursor: pointer; }
+  tbody tr.selected-row { background: rgba(227,24,55,0.1) !important; }
+  .aircraft-card { cursor: pointer; }
+  .aircraft-card.selected-card { background: rgba(227,24,55,0.1); border-left-color: #fff !important; }
+
+  /* Panel mobile full screen */
+  @media (max-width: 768px) {
+    .photo-panel {
+      width: 100%;
+      top: 0;
+    }
+    .panel-header { padding: 14px 16px; }
+    .info-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* MOBILE STATS BAR */
+  .mobile-stats {
+    display: none;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    justify-content: space-around;
+  }
+
+  .mobile-stats .stat-item {
+    text-align: center;
+  }
+
+  /* MOBILE CARD VIEW */
+  .card-view { display: none; }
+
+  .aircraft-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    transition: border-color 0.15s;
+  }
+
+  .aircraft-card:active { border-left-color: #fff; }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 6px;
+  }
+
+  .card-reg {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--red);
+    letter-spacing: 1.5px;
+  }
+
+  .card-age {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    background: rgba(255,255,255,0.05);
+    padding: 2px 7px;
+  }
+
+  .card-type {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+
+  .card-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+  }
+
+  .card-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    padding: 2px 6px;
+    color: var(--muted);
+  }
+
+  .card-name {
+    font-size: 11px;
+    color: #aaa;
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  .card-remark {
+    font-size: 11px;
+    margin-top: 3px;
+  }
+
+  /* MOBILE FILTER SCROLL */
+  @media (max-width: 768px) {
+    header { padding: 0 12px; height: 56px; }
+    .header-stats { display: none; }
+    .mobile-stats { display: flex; }
+    .logo-text { font-size: 16px; letter-spacing: 1.5px; }
+    .logo-emblem { width: 32px; height: 32px; }
+
+    .controls {
+      padding: 10px 12px;
+      gap: 8px;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .search-box { max-width: 100%; min-width: unset; }
+
+    .filter-group {
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 4px;
+    }
+
+    .filter-group::-webkit-scrollbar { height: 2px; }
+
+    .result-count { margin-left: 0; font-size: 11px; }
+
+    /* Hide table, show cards */
+    .table-wrapper { display: none; }
+    .card-view {
+      display: block;
+      padding: 12px 12px 40px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .logo-text { display: none; }
+    .logo-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 15px;
+      letter-spacing: 2px;
+      color: var(--text);
+    }
+    .logo-brand span { color: var(--red); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <!-- THY Official Tulip Emblem -->
+    <svg class="logo-emblem" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:44px;height:44px;flex-shrink:0">
+      <!-- Red circle background -->
+      <circle cx="60" cy="60" r="58" fill="#E31837"/>
+      <!-- Main tulip body - center petal -->
+      <path d="M60 18 C60 18 52 30 50 42 C48 54 52 64 60 68 C68 64 72 54 70 42 C68 30 60 18 60 18Z" fill="white"/>
+      <!-- Left petal -->
+      <path d="M60 40 C60 40 46 36 38 42 C30 48 30 58 36 64 C42 70 52 68 58 62" fill="white"/>
+      <!-- Right petal -->
+      <path d="M60 40 C60 40 74 36 82 42 C90 48 90 58 84 64 C78 70 68 68 62 62" fill="white"/>
+      <!-- Stem -->
+      <rect x="57.5" y="66" width="5" height="28" rx="2.5" fill="white"/>
+      <!-- Leaves -->
+      <path d="M60 80 C60 80 48 76 44 68 C42 63 46 59 52 62 C56 64 59 70 60 75" fill="white"/>
+      <path d="M60 80 C60 80 72 76 76 68 C78 63 74 59 68 62 C64 64 61 70 60 75" fill="white"/>
+    </svg>
+    <div class="logo-text">TURKISH <span>AIRLINES</span> <span style="color:var(--muted);font-size:14px">— FLEET</span></div>
+    <div class="logo-brand" style="display:none">TK <span>FLEET</span></div>
+  </div>
+  <div class="header-stats">
+    <div class="stat-item">
+      <div class="stat-num" id="total-count">—</div>
+      <div class="stat-label">Total Aircraft</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="type-count">—</div>
+      <div class="stat-label">Aircraft Types</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="avg-age">—</div>
+      <div class="stat-label">Avg Age (yrs)</div>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile stats bar -->
+<div class="mobile-stats">
+  <div class="stat-item">
+    <div class="stat-num" id="total-count-m">—</div>
+    <div class="stat-label">Uçak</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" id="type-count-m">—</div>
+    <div class="stat-label">Tip</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" id="avg-age-m">—</div>
+    <div class="stat-label">Ort. Yaş</div>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="search-box">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="search" placeholder="REG, tip, isim ara...">
+  </div>
+  <div class="filter-group" id="type-filters">
+    <button class="filter-btn active" data-filter="all">Tümü</button>
+    <button class="filter-btn" data-filter="A319">A319</button>
+    <button class="filter-btn" data-filter="A320">A320</button>
+    <button class="filter-btn" data-filter="A321">A321</button>
+    <button class="filter-btn" data-filter="A321neo">A321neo</button>
+    <button class="filter-btn" data-filter="A330">A330</button>
+    <button class="filter-btn" data-filter="A350">A350</button>
+    <button class="filter-btn" data-filter="B737">B737</button>
+    <button class="filter-btn" data-filter="B777">B777</button>
+    <button class="filter-btn" data-filter="B787">B787</button>
+    <button class="filter-btn" data-filter="Cargo">Cargo</button>
+  </div>
+  <div class="result-count"><span id="shown-count">—</span> uçak gösteriliyor</div>
+</div>
+
+<div class="table-wrapper">
+  <table id="fleet-table">
+    <thead>
+      <tr>
+        <th data-col="reg">REG</th>
+        <th data-col="type">TİP</th>
+        <th data-col="config">KONFİG</th>
+        <th data-col="delivered">TESLİM</th>
+        <th data-col="remark">AÇIKLAMA</th>
+        <th data-col="name">İSİM</th>
+        <th data-col="age">YAŞ</th>
+      </tr>
+    </thead>
+    <tbody id="fleet-body"></tbody>
+  </table>
+</div>
+
+<div class="card-view" id="card-view"></div>
+
+<footer>
+  Veri kaynağı: Planespotters.net &nbsp;|&nbsp; <span>Turkish Airlines Current Fleet</span> &nbsp;|&nbsp; © 2026
+</footer>
+
+<!-- PHOTO PANEL OVERLAY -->
+<div class="panel-overlay" id="panel-overlay"></div>
+
+<!-- PHOTO PANEL -->
+<div class="photo-panel" id="photo-panel">
+  <div class="panel-header">
+    <div>
+      <div class="panel-reg" id="panel-reg">—</div>
+      <div style="font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-top:2px" id="panel-subtype">—</div>
+    </div>
+    <button class="panel-close" id="panel-close">✕</button>
+  </div>
+  <div class="panel-body" id="panel-body">
+    <div class="panel-loading">
+      <div class="spinner"></div>
+      <div class="panel-loading-text">FOTOĞRAF YÜKLENİYOR...</div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+const fleetData = [
+  // PAGE 1 — A330-200F Cargo
+  {reg:"TC-JCI",type:"Airbus A330-200F",config:"Cargo",delivered:"Aug 2013",remark:"opf Turkish Cargo",name:"Kervan",age:12.7},
+  {reg:"TC-JDO",type:"Airbus A330-200F",config:"Cargo",delivered:"Sep 2010",remark:"opf Turkish Cargo",name:"Meriç",age:16.4},
+  {reg:"TC-JDP",type:"Airbus A330-200F",config:"Cargo",delivered:"Jun 2011",remark:"opf Turkish Cargo",name:"Fırat",age:14.9},
+  {reg:"TC-JDR",type:"Airbus A330-200F",config:"Cargo",delivered:"Oct 2012",remark:"opf Turkish Cargo",name:"Gediz",age:13.6},
+  {reg:"TC-JDS",type:"Airbus A330-200F",config:"Cargo",delivered:"May 2013",remark:"opf Turkish Cargo",name:"Trakya",age:12.9},
+  {reg:"TC-JOO",type:"Airbus A330-200F",config:"Cargo",delivered:"Sep 2018",remark:"opf Turkish Cargo",name:"",age:14.3},
+  {reg:"TC-JOU",type:"Airbus A330-200F",config:"Cargo",delivered:"Apr 2015",remark:"opf Turkish Cargo",name:"Ceyhan",age:11.8},
+  {reg:"TC-JOV",type:"Airbus A330-200F",config:"Cargo",delivered:"Apr 2016",remark:"opf Turkish Cargo",name:"Çoruh",age:10},
+  {reg:"TC-JOY",type:"Airbus A330-200F",config:"Cargo",delivered:"Oct 2016",remark:"opf Turkish Cargo",name:"Ergene",age:9.6},
+  {reg:"TC-JOZ",type:"Airbus A330-200F",config:"Cargo",delivered:"Feb 2017",remark:"opf Turkish Cargo",name:"",age:9.2},
+  // Boeing 777F Cargo
+  {reg:"TC-LJL",type:"Boeing 777F",config:"Cargo",delivered:"Nov 2017",remark:"opf Turkish Cargo",name:"",age:8.4},
+  {reg:"TC-LJM",type:"Boeing 777F",config:"Cargo",delivered:"Dec 2017",remark:"opf Turkish Cargo",name:"",age:8.3},
+  {reg:"TC-LJN",type:"Boeing 777F",config:"Cargo",delivered:"Sep 2018",remark:"opf Turkish Cargo",name:"",age:7.6},
+  {reg:"TC-LJO",type:"Boeing 777F",config:"Cargo",delivered:"Nov 2018",remark:"opf Turkish Cargo",name:"",age:7.5},
+  {reg:"TC-LJP",type:"Boeing 777F",config:"Cargo",delivered:"Dec 2018",remark:"opf Turkish Cargo",name:"",age:7.4},
+  {reg:"TC-LJR",type:"Boeing 777F",config:"Cargo",delivered:"Oct 2019",remark:"opf Turkish Cargo",name:"",age:6.6},
+  {reg:"TC-LJS",type:"Boeing 777F",config:"Cargo",delivered:"Jan 2020",remark:"opf Turkish Cargo",name:"",age:6.3},
+  {reg:"TC-LJT",type:"Boeing 777F",config:"Cargo",delivered:"Mar 2020",remark:"opf Turkish Cargo",name:"",age:6.2},
+  {reg:"TC-LJU",type:"Boeing 777F",config:"Cargo",delivered:"Oct 2025",remark:"opf Turkish Cargo",name:"",age:0.6},
+  {reg:"TC-LJV",type:"Boeing 777F",config:"Cargo",delivered:"Nov 2025",remark:"opf Turkish Cargo",name:"",age:0.4},
+  {reg:"TC-LJY",type:"Boeing 777F",config:"Cargo",delivered:"Dec 2025",remark:"opf Turkish Cargo",name:"",age:0.4},
+  {reg:"TC-LJZ",type:"Boeing 777F",config:"Cargo",delivered:"Jan 2026",remark:"opf Turkish Cargo",name:"",age:0.3},
+  // A330-300
+  {reg:"TC-LON",type:"Airbus A330-300",config:"CY367",delivered:"Nov 2024",remark:"Parked at IST, lsd",name:"",age:13.3},
+  // A321-200 CY220
+  {reg:"TC-JRF",type:"Airbus A321-200",config:"CY220",delivered:"Jul 2007",remark:"100th Anniversary cs",name:"Fethiye",age:18.7},
+  {reg:"TC-JRG",type:"Airbus A321-200",config:"CY220",delivered:"Oct 2007",remark:"Parked / Maintenance",name:"Finike",age:18.5},
+  {reg:"TC-JRH",type:"Airbus A321-200",config:"CY220",delivered:"Jan 2008",remark:"",name:"Yalova",age:18.2},
+  {reg:"TC-JRI",type:"Airbus A321-200",config:"CY220",delivered:"Feb 2008",remark:"",name:"Adıyaman",age:18.2},
+  {reg:"TC-JRJ",type:"Airbus A321-200",config:"CY220",delivered:"Mar 2008",remark:"Parked / Maintenance",name:"Çorum",age:18.1},
+  {reg:"TC-JRK",type:"Airbus A321-200",config:"CY220",delivered:"May 2008",remark:"",name:"Batman",age:17.9},
+  {reg:"TC-JRL",type:"Airbus A321-200",config:"CY220",delivered:"Jun 2008",remark:"Star Alliance cs",name:"Tarsus",age:17.9},
+  // A321-200 CY194
+  {reg:"TC-JML",type:"Airbus A321-200",config:"CY194",delivered:"Aug 2009",remark:"",name:"Eminönü",age:18.2},
+  {reg:"TC-JRA",type:"Airbus A321-200",config:"CY194",delivered:"Jul 2006",remark:"Star Alliance cs",name:"Kütahya",age:19.8},
+  {reg:"TC-JRB",type:"Airbus A321-200",config:"CY194",delivered:"Aug 2006",remark:"Star Alliance cs",name:"Kırıkkale",age:19.7},
+  {reg:"TC-JRC",type:"Airbus A321-200",config:"CY194",delivered:"Jan 2007",remark:"",name:"Gerede",age:19.3},
+  {reg:"TC-JRD",type:"Airbus A321-200",config:"CY194",delivered:"Feb 2007",remark:"Star Alliance cs",name:"Balıkesir",age:19.2},
+  {reg:"TC-JRE",type:"Airbus A321-200",config:"CY194",delivered:"May 2007",remark:"",name:"Beypazarı",age:18.9},
+  {reg:"TC-LBC",type:"Airbus A321-200",config:"CY194",delivered:"May 2025",remark:"lsd",name:"",age:12.1},
+  {reg:"TC-LBD",type:"Airbus A321-200",config:"CY194",delivered:"Dec 2024",remark:"lsd",name:"",age:11.6},
+  // A320-200 CY186
+  {reg:"TC-JTS",type:"Airbus A320-200",config:"CY186",delivered:"Oct 2024",remark:"lsd",name:"",age:8.8},
+  {reg:"TC-JTT",type:"Airbus A320-200",config:"CY186",delivered:"Oct 2024",remark:"Parked / Maintenance, lsd",name:"",age:9.5},
+  {reg:"TC-JTU",type:"Airbus A320-200",config:"CY186",delivered:"Sep 2024",remark:"lsd",name:"",age:8.7},
+  // A320-200 CY180
+  {reg:"TC-EIA",type:"Airbus A320-200",config:"CY180",delivered:"Dec 2024",remark:"lsd",name:"",age:14.1},
+  {reg:"TC-JTV",type:"Airbus A320-200",config:"CY180",delivered:"Nov 2024",remark:"Parked / Maintenance, lsd",name:"",age:14.4},
+  {reg:"TC-LBM",type:"Airbus A320-200",config:"CY180",delivered:"Jul 2025",remark:"lsd",name:"",age:13},
+  {reg:"TC-LBP",type:"Airbus A320-200",config:"CY180",delivered:"Aug 2025",remark:"lsd",name:"",age:12},
+  {reg:"TC-LBU",type:"Airbus A320-200",config:"CY180",delivered:"May 2025",remark:"lsd",name:"",age:13},
+  {reg:"TC-LBV",type:"Airbus A320-200",config:"CY180",delivered:"Jun 2025",remark:"Parked / Maintenance, lsd",name:"",age:12.9},
+  // A320-200 CY159
+  {reg:"TC-JPH",type:"Airbus A320-200",config:"CY159",delivered:"Jul 2007",remark:"",name:"Kars",age:18.8},
+  {reg:"TC-JPI",type:"Airbus A320-200",config:"CY159",delivered:"Aug 2007",remark:"",name:"Doğubeyazıt",age:18.8},
+  {reg:"TC-JPJ",type:"Airbus A320-200",config:"CY159",delivered:"Sep 2007",remark:"",name:"Edremit",age:18.6},
+  {reg:"TC-JPK",type:"Airbus A320-200",config:"CY159",delivered:"Oct 2007",remark:"Star Alliance cs",name:"Erdek",age:18.6},
+  {reg:"TC-JPL",type:"Airbus A320-200",config:"CY159",delivered:"Nov 2007",remark:"Parked / Maintenance",name:"Göreme",age:18.5},
+  // PAGE 2
+  {reg:"TC-JPM",type:"Airbus A320-200",config:"CY159",delivered:"Dec 2007",remark:"",name:"Harput",age:18.4},
+  {reg:"TC-JPN",type:"Airbus A320-200",config:"CY159",delivered:"Jul 2008",remark:"",name:"Mardin",age:17.8},
+  {reg:"TC-JPP",type:"Airbus A320-200",config:"CY159",delivered:"Sep 2008",remark:"Star Alliance cs",name:"Harran",age:17.6},
+  {reg:"TC-JPR",type:"Airbus A320-200",config:"CY159",delivered:"Nov 2008",remark:"Star Alliance cs",name:"Kuşadası",age:17.5},
+  {reg:"TC-JPS",type:"Airbus A320-200",config:"CY159",delivered:"Dec 2008",remark:"Star Alliance cs",name:"Burdur",age:17.4},
+  {reg:"TC-JPT",type:"Airbus A320-200",config:"CY159",delivered:"Nov 2008",remark:"",name:"Ihlara",age:17.4},
+  {reg:"TC-JPZ",type:"Airbus A320-200",config:"CY159",delivered:"Jul 2023",remark:"",name:"",age:17.8},
+  // A319-100
+  {reg:"TC-JLS",type:"Airbus A319-100",config:"CY132",delivered:"Mar 2011",remark:"",name:"Salihli",age:15.1},
+  {reg:"TC-JLT",type:"Airbus A319-100",config:"CY132",delivered:"Apr 2011",remark:"",name:"Adılcevaz",age:15},
+  {reg:"TC-JLU",type:"Airbus A319-100",config:"CY132",delivered:"May 2011",remark:"Star Alliance cs",name:"Sultanahmet",age:15},
+  {reg:"TC-JLV",type:"Airbus A319-100",config:"CY132",delivered:"Jun 2011",remark:"",name:"Sapanca",age:14.8},
+  {reg:"TC-JLY",type:"Airbus A319-100",config:"CY132",delivered:"Jul 2011",remark:"Parked / Maintenance",name:"Bergama",age:14.8},
+  {reg:"TC-JLZ",type:"Airbus A319-100",config:"CY132",delivered:"Aug 2011",remark:"",name:"Edirnekapı",age:14.7},
+  // B777-300ER C49Y300
+  {reg:"TC-JJE",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Oct 2010",remark:"",name:"Dolmabahçe",age:15.6},
+  {reg:"TC-JJF",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Oct 2010",remark:"",name:"Beylerbeyi",age:15.5},
+  {reg:"TC-JJG",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Nov 2010",remark:"",name:"Yıldız",age:15.4},
+  {reg:"TC-JJH",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Dec 2010",remark:"",name:"Rumeli",age:15.4},
+  {reg:"TC-JJI",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Dec 2010",remark:"",name:"Ege",age:15.3},
+  {reg:"TC-JJJ",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Jan 2011",remark:"",name:"Erzurum",age:15.2},
+  {reg:"TC-JJK",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Feb 2011",remark:"",name:"Akdeniz",age:15.2},
+  {reg:"TC-JJL",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Feb 2011",remark:"",name:"Karadeniz",age:15.2},
+  {reg:"TC-JJM",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Mar 2011",remark:"",name:"Marmara",age:15.1},
+  {reg:"TC-JJN",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Jun 2011",remark:"",name:"Anadolu",age:14.8},
+  {reg:"TC-JJO",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Aug 2011",remark:"",name:"İstanbul",age:14.7},
+  {reg:"TC-JJP",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Sep 2011",remark:"",name:"Ankara",age:14.6},
+  {reg:"TC-JJR",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Jul 2014",remark:"",name:"Erciyes",age:11.8},
+  {reg:"TC-JJS",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Jul 2014",remark:"Parked / Maintenance",name:"Zigana",age:11.8},
+  {reg:"TC-JJT",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Sep 2014",remark:"",name:"Çukurova",age:11.7},
+  {reg:"TC-JJU",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Dec 2014",remark:"",name:"Büyükada",age:11.4},
+  {reg:"TC-JJV",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Mar 2015",remark:"",name:"Heybeliada",age:11.2},
+  {reg:"TC-JJY",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Mar 2015",remark:"",name:"Kınalıada",age:11.1},
+  {reg:"TC-JJZ",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Apr 2015",remark:"",name:"Uzungöl",age:11.1},
+  {reg:"TC-LJA",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Apr 2015",remark:"",name:"Adana",age:11},
+  {reg:"TC-LJB",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Sep 2015",remark:"",name:"Ayasofya",age:10.7},
+  {reg:"TC-LJC",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Sep 2015",remark:"",name:"",age:10.6},
+  {reg:"TC-LJD",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Dec 2015",remark:"",name:"Selimiye",age:10.4},
+  {reg:"TC-LJE",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Jan 2016",remark:"",name:"Sümela",age:10.3},
+  {reg:"TC-LJF",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Mar 2016",remark:"",name:"Ortaköy",age:10.1},
+  {reg:"TC-LJG",type:"Boeing 777-300ER",config:"C49Y300",delivered:"May 2016",remark:"",name:"",age:10},
+  {reg:"TC-LJH",type:"Boeing 777-300ER",config:"C49Y300",delivered:"May 2016",remark:"Bio Fuel cs",name:"",age:9.9},
+  {reg:"TC-LJI",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Jun 2016",remark:"",name:"",age:9.9},
+  {reg:"TC-LJJ",type:"Boeing 777-300ER",config:"C49Y300",delivered:"Jun 2016",remark:"",name:"",age:9.8},
+  {reg:"TC-LJK",type:"Boeing 777-300ER",config:"C49Y300",delivered:"May 2017",remark:"",name:"İzmir",age:9.1},
+  // A330-300 C40Y265
+  {reg:"TC-LOA",type:"Airbus A330-300",config:"C40Y265",delivered:"Mar 2017",remark:"Parked / Maintenance, lsd",name:"",age:12.3},
+  {reg:"TC-LOB",type:"Airbus A330-300",config:"C40Y265",delivered:"May 2017",remark:"Parked / Maintenance, lsd",name:"",age:12.2},
+  {reg:"TC-LOC",type:"Airbus A330-300",config:"C40Y265",delivered:"Mar 2017",remark:"lsd",name:"",age:11.8},
+  {reg:"TC-LOD",type:"Airbus A330-300",config:"C40Y265",delivered:"Apr 2017",remark:"lsd",name:"",age:11.7},
+  {reg:"TC-LOE",type:"Airbus A330-300",config:"C40Y265",delivered:"Dec 2016",remark:"Parked at ISL, lsd",name:"",age:11.3},
+  {reg:"TC-LOF",type:"Airbus A330-300",config:"C40Y265",delivered:"Feb 2017",remark:"lsd",name:"",age:10.4},
+  {reg:"TC-LOG",type:"Airbus A330-300",config:"C40Y265",delivered:"Apr 2017",remark:"lsd",name:"",age:10.3},
+  // A350-900
+  {reg:"TC-LHH",type:"Airbus A350-900",config:"C32Y310",delivered:"Dec 2025",remark:"500th Aircraft cs",name:"TK Aile",age:0.4},
+  {reg:"TC-LHI",type:"Airbus A350-900",config:"C32Y310",delivered:"Dec 2025",remark:"",name:"",age:0.5},
+  // PAGE 3
+  {reg:"TC-LHJ",type:"Airbus A350-900",config:"C32Y310",delivered:"Dec 2025",remark:"",name:"",age:0.4},
+  {reg:"TC-LGA",type:"Airbus A350-900",config:"C32Y297",delivered:"Oct 2020",remark:"",name:"",age:6.1},
+  {reg:"TC-LGB",type:"Airbus A350-900",config:"C32Y297",delivered:"Oct 2020",remark:"lsd",name:"",age:5.9},
+  {reg:"TC-LGC",type:"Airbus A350-900",config:"C32Y297",delivered:"Jan 2021",remark:"lsd",name:"",age:5.7},
+  {reg:"TC-LGD",type:"Airbus A350-900",config:"C32Y297",delivered:"Mar 2021",remark:"lsd",name:"",age:5.2},
+  {reg:"TC-LGE",type:"Airbus A350-900",config:"C32Y297",delivered:"May 2021",remark:"",name:"",age:5},
+  {reg:"TC-LGF",type:"Airbus A350-900",config:"C32Y297",delivered:"Feb 2022",remark:"",name:"",age:4.2},
+  {reg:"TC-LGG",type:"Airbus A350-900",config:"C32Y297",delivered:"Jul 2022",remark:"",name:"",age:3.8},
+  {reg:"TC-LGH",type:"Airbus A350-900",config:"C32Y297",delivered:"Feb 2023",remark:"400th Aircraft cs",name:"Tek Yürek",age:3.2},
+  {reg:"TC-LGM",type:"Airbus A350-900",config:"C32Y297",delivered:"Jun 2023",remark:"",name:"",age:2.9},
+  {reg:"TC-LGN",type:"Airbus A350-900",config:"C32Y297",delivered:"Jul 2023",remark:"",name:"",age:2.8},
+  {reg:"TC-LGO",type:"Airbus A350-900",config:"C32Y297",delivered:"Nov 2023",remark:"",name:"",age:2.5},
+  {reg:"TC-LGP",type:"Airbus A350-900",config:"C32Y297",delivered:"Dec 2023",remark:"",name:"",age:2.4},
+  {reg:"TC-LGR",type:"Airbus A350-900",config:"C32Y297",delivered:"Feb 2024",remark:"",name:"",age:2.2},
+  {reg:"TC-LGS",type:"Airbus A350-900",config:"C32Y297",delivered:"Mar 2024",remark:"",name:"",age:2.2},
+  {reg:"TC-LGT",type:"Airbus A350-900",config:"C32Y297",delivered:"May 2024",remark:"",name:"",age:2},
+  {reg:"TC-LGU",type:"Airbus A350-900",config:"C32Y297",delivered:"Jun 2024",remark:"",name:"",age:1.9},
+  {reg:"TC-LGV",type:"Airbus A350-900",config:"C32Y297",delivered:"Jul 2024",remark:"",name:"",age:1.8},
+  {reg:"TC-LGY",type:"Airbus A350-900",config:"C32Y297",delivered:"Aug 2024",remark:"",name:"",age:1.7},
+  {reg:"TC-LGZ",type:"Airbus A350-900",config:"C32Y297",delivered:"Aug 2024",remark:"",name:"",age:1.7},
+  {reg:"TC-LHA",type:"Airbus A350-900",config:"C32Y297",delivered:"Sep 2024",remark:"",name:"",age:1.6},
+  {reg:"TC-LHB",type:"Airbus A350-900",config:"C32Y297",delivered:"Mar 2025",remark:"",name:"Şebinkarahisar",age:1.2},
+  {reg:"TC-LHC",type:"Airbus A350-900",config:"C32Y297",delivered:"Mar 2025",remark:"",name:"",age:1.1},
+  {reg:"TC-LHD",type:"Airbus A350-900",config:"C32Y297",delivered:"Apr 2025",remark:"",name:"",age:1.1},
+  {reg:"TC-LHE",type:"Airbus A350-900",config:"C32Y297",delivered:"May 2025",remark:"",name:"",age:1},
+  {reg:"TC-LHF",type:"Airbus A350-900",config:"C32Y297",delivered:"Jul 2025",remark:"",name:"Osmancık",age:0.8},
+  {reg:"TC-LHG",type:"Airbus A350-900",config:"C32Y297",delivered:"Sep 2025",remark:"",name:"",age:0.8},
+  // B787-9
+  {reg:"TC-LLA",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Jun 2019",remark:"",name:"Maçka",age:6.8},
+  {reg:"TC-LLB",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Jul 2019",remark:"",name:"",age:6.8},
+  {reg:"TC-LLC",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Jul 2019",remark:"",name:"",age:6.8},
+  {reg:"TC-LLD",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Jul 2019",remark:"",name:"",age:6.7},
+  {reg:"TC-LLE",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Sep 2019",remark:"",name:"",age:6.6},
+  {reg:"TC-LLF",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Aug 2019",remark:"",name:"",age:6.7},
+  {reg:"TC-LLG",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Jan 2020",remark:"",name:"",age:6.3},
+  {reg:"TC-LLH",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Feb 2020",remark:"",name:"",age:6.3},
+  {reg:"TC-LLI",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Feb 2020",remark:"",name:"",age:6.3},
+  {reg:"TC-LLJ",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Mar 2020",remark:"",name:"",age:6.2},
+  {reg:"TC-LLK",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Mar 2020",remark:"",name:"",age:6.1},
+  {reg:"TC-LLM",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Jul 2020",remark:"lsd",name:"",age:5.9},
+  {reg:"TC-LLN",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Sep 2020",remark:"",name:"",age:5.8},
+  {reg:"TC-LLO",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Sep 2020",remark:"",name:"",age:5.7},
+  {reg:"TC-LLP",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Jun 2021",remark:"",name:"",age:5.8},
+  {reg:"TC-LLR",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Jul 2023",remark:"",name:"",age:4.5},
+  {reg:"TC-LLS",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"May 2023",remark:"",name:"",age:4.5},
+  {reg:"TC-LLT",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Sep 2023",remark:"",name:"",age:4.3},
+  {reg:"TC-LLU",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Dec 2022",remark:"",name:"",age:3.3},
+  {reg:"TC-LLV",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Aug 2023",remark:"",name:"",age:2.7},
+  {reg:"TC-LLY",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Oct 2023",remark:"",name:"",age:2.6},
+  {reg:"TC-LLZ",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Dec 2023",remark:"",name:"",age:2.4},
+  {reg:"TC-LMB",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Feb 2024",remark:"",name:"",age:2.3},
+  {reg:"TC-LMC",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Jul 2025",remark:"",name:"",age:0.8},
+  {reg:"TC-LMD",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Sep 2025",remark:"",name:"",age:0.6},
+  // PAGE 4
+  {reg:"TC-LME",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"Oct 2025",remark:"",name:"",age:0.5},
+  {reg:"TC-",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"On Order",remark:"lsd",name:"",age:0,onOrder:true},
+  {reg:"TC-",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"On Order",remark:"",name:"",age:0,onOrder:true},
+  {reg:"TC-",type:"Boeing 787-9 Dreamliner",config:"C30Y270",delivered:"On Order",remark:"lsd",name:"",age:0,onOrder:true},
+  // B777-300ER C28Y372
+  {reg:"TC-LKB",type:"Boeing 777-300ER",config:"C28Y372",delivered:"Apr 2016",remark:"",name:"",age:12},
+  {reg:"TC-LKC",type:"Boeing 777-300ER",config:"C28Y372",delivered:"Jul 2016",remark:"Parked / Maintenance",name:"",age:11.9},
+  // A350-900 C28Y288
+  {reg:"TC-LGI",type:"Airbus A350-900",config:"C28Y288",delivered:"Jun 2022",remark:"",name:"",age:4.5},
+  {reg:"TC-LGJ",type:"Airbus A350-900",config:"C28Y288",delivered:"Jun 2022",remark:"Parked / Maintenance",name:"",age:4.4},
+  {reg:"TC-LGK",type:"Airbus A350-900",config:"C28Y288",delivered:"Jul 2022",remark:"",name:"",age:4.2},
+  {reg:"TC-LGL",type:"Airbus A350-900",config:"C28Y288",delivered:"Jul 2022",remark:"",name:"",age:4},
+  // A330-300 C28Y261
+  {reg:"TC-JNH",type:"Airbus A330-300",config:"C28Y261",delivered:"Sep 2010",remark:"",name:"Topkapı",age:15.6},
+  {reg:"TC-JNI",type:"Airbus A330-300",config:"C28Y261",delivered:"Oct 2010",remark:"",name:"Konak",age:15.5},
+  {reg:"TC-JNJ",type:"Airbus A330-300",config:"C28Y261",delivered:"Nov 2010",remark:"",name:"Kapadokya",age:15.4},
+  {reg:"TC-JNK",type:"Airbus A330-300",config:"C28Y261",delivered:"Nov 2010",remark:"Parked / Maintenance",name:"Şanlıurfa",age:15.4},
+  {reg:"TC-JNL",type:"Airbus A330-300",config:"C28Y261",delivered:"Mar 2011",remark:"",name:"Trabzon",age:15.2},
+  {reg:"TC-JNM",type:"Airbus A330-300",config:"C28Y261",delivered:"Mar 2011",remark:"",name:"Samsun",age:15.1},
+  {reg:"TC-JNN",type:"Airbus A330-300",config:"C28Y261",delivered:"May 2011",remark:"",name:"Selçuklu",age:15},
+  {reg:"TC-JNO",type:"Airbus A330-300",config:"C28Y261",delivered:"Mar 2012",remark:"",name:"Boğaziçi",age:14.1},
+  {reg:"TC-JNP",type:"Airbus A330-300",config:"C28Y261",delivered:"Apr 2012",remark:"",name:"Gökçeada",age:14},
+  {reg:"TC-JNR",type:"Airbus A330-300",config:"C28Y261",delivered:"May 2012",remark:"",name:"Haliç Golden Horn",age:14},
+  {reg:"TC-JNS",type:"Airbus A330-300",config:"C28Y261",delivered:"Nov 2013",remark:"lsd",name:"Hattuşaş",age:12.5},
+  {reg:"TC-JNT",type:"Airbus A330-300",config:"C28Y261",delivered:"Dec 2013",remark:"lsd",name:"Bursa",age:12.4},
+  {reg:"TC-JNZ",type:"Airbus A330-300",config:"C28Y261",delivered:"Jan 2014",remark:"Parked / Maintenance, lsd",name:"Kartalkaya",age:12.3},
+  {reg:"TC-JOA",type:"Airbus A330-300",config:"C28Y261",delivered:"Mar 2014",remark:"lsd",name:"Pamukkale",age:12.2},
+  {reg:"TC-JOB",type:"Airbus A330-300",config:"C28Y261",delivered:"Apr 2014",remark:"",name:"Bozcaada",age:12.1},
+  {reg:"TC-JOD",type:"Airbus A330-300",config:"C28Y261",delivered:"Jun 2014",remark:"Parked / Maintenance",name:"Malazgirt",age:11.8},
+  {reg:"TC-JOE",type:"Airbus A330-300",config:"C28Y261",delivered:"Nov 2014",remark:"",name:"Diyarbakır",age:11.5},
+  {reg:"TC-JOF",type:"Airbus A330-300",config:"C28Y261",delivered:"Apr 2015",remark:"",name:"Sakarya",age:11.1},
+  {reg:"TC-JOG",type:"Airbus A330-300",config:"C28Y261",delivered:"Apr 2015",remark:"",name:"Truva (Troy)",age:11},
+  {reg:"TC-JOH",type:"Airbus A330-300",config:"C28Y261",delivered:"Apr 2015",remark:"",name:"Sivas",age:11},
+  {reg:"TC-JOI",type:"Airbus A330-300",config:"C28Y261",delivered:"May 2015",remark:"",name:"Kızılcahamam",age:11},
+  {reg:"TC-JOJ",type:"Airbus A330-300",config:"C28Y261",delivered:"Jun 2015",remark:"",name:"Rize-Artvin",age:10.8},
+  {reg:"TC-JOK",type:"Airbus A330-300",config:"C28Y261",delivered:"Jul 2015",remark:"",name:"",age:10.8},
+  {reg:"TC-JOL",type:"Airbus A330-300",config:"C28Y261",delivered:"Jun 2015",remark:"",name:"Aydın",age:10.8},
+  {reg:"TC-LNC",type:"Airbus A330-300",config:"C28Y261",delivered:"Feb 2016",remark:"",name:"Refahiye",age:10.2},
+  {reg:"TC-LND",type:"Airbus A330-300",config:"C28Y261",delivered:"Feb 2016",remark:"",name:"",age:10.2},
+  {reg:"TC-LNE",type:"Airbus A330-300",config:"C28Y261",delivered:"Mar 2016",remark:"",name:"Göbeklitepe",age:10.1},
+  {reg:"TC-LNF",type:"Airbus A330-300",config:"C28Y261",delivered:"Apr 2016",remark:"Turkish Airlines Holidays sticker",name:"Kocaeli",age:10.1},
+  {reg:"TC-LNG",type:"Airbus A330-300",config:"C28Y261",delivered:"Jun 2016",remark:"",name:"",age:9.9},
+  // A330-200 C24Y255
+  {reg:"TC-JIO",type:"Airbus A330-200",config:"C24Y255",delivered:"Jun 2014",remark:"lsd",name:"Eskişehir",age:18.5},
+  {reg:"TC-JIP",type:"Airbus A330-200",config:"C24Y255",delivered:"Aug 2014",remark:"lsd",name:"Lale (Tulip)",age:18.5},
+  {reg:"TC-JIS",type:"Airbus A330-200",config:"C24Y255",delivered:"Sep 2014",remark:"Parked / Maintenance, lsd",name:"",age:17.5},
+  {reg:"TC-JIT",type:"Airbus A330-200",config:"C24Y255",delivered:"Sep 2014",remark:"Parked / Maintenance, lsd",name:"",age:17.4},
+  {reg:"TC-LOH",type:"Airbus A330-200",config:"C24Y255",delivered:"Jun 2018",remark:"lsd",name:"",age:15.1},
+  {reg:"TC-LOM",type:"Airbus A330-200",config:"C24Y222",delivered:"Apr 2024",remark:"lsd",name:"",age:13.1},
+  // A321neo C20Y162
+  {reg:"TC-LSA",type:"Airbus A321neo",config:"C20Y162",delivered:"Jul 2018",remark:"",name:"Rize",age:7.8},
+  {reg:"TC-LSB",type:"Airbus A321neo",config:"C20Y162",delivered:"Mar 2019",remark:"",name:"Kilis",age:7.1},
+  {reg:"TC-LSC",type:"Airbus A321neo",config:"C20Y162",delivered:"Dec 2018",remark:"",name:"Bakırköy",age:7.3},
+  {reg:"TC-LSD",type:"Airbus A321neo",config:"C20Y162",delivered:"Feb 2019",remark:"Parked at IST",name:"Osmaniye",age:7.2},
+  {reg:"TC-LSE",type:"Airbus A321neo",config:"C20Y162",delivered:"Mar 2019",remark:"",name:"Bilecik",age:7.1},
+  {reg:"TC-LSF",type:"Airbus A321neo",config:"C20Y162",delivered:"Jun 2019",remark:"",name:"Hasankeyf",age:6.8},
+  {reg:"TC-LSG",type:"Airbus A321neo",config:"C20Y162",delivered:"May 2019",remark:"Parked at IST",name:"Yozgat",age:6.9},
+  // PAGE 5
+  {reg:"TC-LSH",type:"Airbus A321neo",config:"C20Y162",delivered:"Aug 2019",remark:"",name:"Sivrihisar",age:6.7},
+  {reg:"TC-LSJ",type:"Airbus A321neo",config:"C20Y162",delivered:"Oct 2019",remark:"Parked / Maintenance, lsd",name:"Esenler",age:6.5},
+  {reg:"TC-LSK",type:"Airbus A321neo",config:"C20Y162",delivered:"Oct 2019",remark:"",name:"Aksaray",age:6.5},
+  {reg:"TC-LSL",type:"Airbus A321neo",config:"C20Y162",delivered:"Feb 2020",remark:"lsd",name:"Midyat",age:6.2},
+  {reg:"TC-LSM",type:"Airbus A321neo",config:"C20Y162",delivered:"Nov 2019",remark:"",name:"Karabük",age:6.4},
+  {reg:"TC-LSN",type:"Airbus A321neo",config:"C20Y162",delivered:"Dec 2019",remark:"lsd",name:"Erzincan",age:6.3},
+  {reg:"TC-LSO",type:"Airbus A321neo",config:"C20Y162",delivered:"Dec 2019",remark:"",name:"Alanya",age:6.3},
+  {reg:"TC-LSP",type:"Airbus A321neo",config:"C20Y162",delivered:"Dec 2019",remark:"lsd",name:"Kadıköy",age:6.4},
+  {reg:"TC-LSR",type:"Airbus A321neo",config:"C20Y162",delivered:"Apr 2020",remark:"",name:"İnegöl",age:6.1},
+  {reg:"TC-LSS",type:"Airbus A321neo",config:"C20Y162",delivered:"Jun 2020",remark:"Parked / Maintenance, lsd",name:"Bandırma",age:6.1},
+  {reg:"TC-LST",type:"Airbus A321neo",config:"C20Y162",delivered:"Jun 2020",remark:"lsd",name:"Palandöken",age:6},
+  {reg:"TC-LSU",type:"Airbus A321neo",config:"C20Y162",delivered:"Apr 2020",remark:"",name:"Siirt",age:6.1},
+  {reg:"TC-LSV",type:"Airbus A321neo",config:"C20Y162",delivered:"Sep 2020",remark:"",name:"Yedigöller",age:5.6},
+  {reg:"TC-LSY",type:"Airbus A321neo",config:"C20Y162",delivered:"Jul 2020",remark:"",name:"Nevşehir",age:5.8},
+  {reg:"TC-LSZ",type:"Airbus A321neo",config:"C20Y162",delivered:"Oct 2020",remark:"",name:"Erenköy",age:5.5},
+  {reg:"TC-LTA",type:"Airbus A321neo",config:"C20Y162",delivered:"Oct 2020",remark:"",name:"",age:5.5},
+  {reg:"TC-LTB",type:"Airbus A321neo",config:"C20Y162",delivered:"Dec 2020",remark:"lsd",name:"",age:5.4},
+  {reg:"TC-LTC",type:"Airbus A321neo",config:"C20Y162",delivered:"Nov 2020",remark:"lsd",name:"",age:5.4},
+  {reg:"TC-LTD",type:"Airbus A321neo",config:"C20Y162",delivered:"Apr 2021",remark:"",name:"",age:5},
+  {reg:"TC-LTE",type:"Airbus A321neo",config:"C20Y162",delivered:"Apr 2021",remark:"",name:"",age:5},
+  {reg:"TC-LTF",type:"Airbus A321neo",config:"C20Y162",delivered:"Jun 2021",remark:"",name:"",age:4.8},
+  {reg:"TC-LTG",type:"Airbus A321neo",config:"C20Y162",delivered:"Jul 2021",remark:"",name:"",age:4.7},
+  {reg:"TC-LTH",type:"Airbus A321neo",config:"C20Y162",delivered:"Jun 2021",remark:"",name:"",age:4.9},
+  {reg:"TC-LTI",type:"Airbus A321neo",config:"C20Y162",delivered:"May 2021",remark:"",name:"",age:4.9},
+  {reg:"TC-LTJ",type:"Airbus A321neo",config:"C20Y162",delivered:"Apr 2022",remark:"lsd",name:"",age:4},
+  {reg:"TC-LTK",type:"Airbus A321neo",config:"C20Y162",delivered:"Mar 2022",remark:"lsd",name:"",age:4.1},
+  {reg:"TC-LTL",type:"Airbus A321neo",config:"C20Y162",delivered:"Nov 2022",remark:"",name:"",age:3.4},
+  {reg:"TC-LTM",type:"Airbus A321neo",config:"C20Y162",delivered:"Jul 2022",remark:"",name:"",age:3.8},
+  {reg:"TC-LTN",type:"Airbus A321neo",config:"C20Y162",delivered:"Nov 2022",remark:"lsd",name:"",age:3.4},
+  {reg:"TC-LTO",type:"Airbus A321neo",config:"C20Y162",delivered:"Dec 2022",remark:"",name:"",age:3.3},
+  {reg:"TC-LTP",type:"Airbus A321neo",config:"C20Y162",delivered:"Feb 2023",remark:"",name:"",age:3.2},
+  {reg:"TC-LTR",type:"Airbus A321neo",config:"C20Y162",delivered:"Mar 2023",remark:"",name:"",age:3.1},
+  {reg:"TC-LUP",type:"Airbus A321neo",config:"C20Y162",delivered:"Jun 2023",remark:"",name:"",age:2.9},
+  // A321-200 C20Y158
+  {reg:"TC-JMH",type:"Airbus A321-200",config:"C20Y158",delivered:"Jan 2009",remark:"lsd",name:"Didim",age:17.4},
+  {reg:"TC-JMI",type:"Airbus A321-200",config:"C20Y158",delivered:"Jan 2009",remark:"lsd",name:"Milas",age:17.4},
+  {reg:"TC-JMJ",type:"Airbus A321-200",config:"C20Y158",delivered:"Feb 2009",remark:"",name:"Tekirdağ",age:17.3},
+  {reg:"TC-JMK",type:"Airbus A321-200",config:"C20Y158",delivered:"Feb 2009",remark:"",name:"Üsküdar",age:17.3},
+  // A330-200 C18Y232
+  {reg:"TC-JNA",type:"Airbus A330-200",config:"C18Y232",delivered:"Dec 2005",remark:"Türkiye cs",name:"Konya",age:20.6},
+  {reg:"TC-JNB",type:"Airbus A330-200",config:"C18Y232",delivered:"Dec 2005",remark:"",name:"Kushimoto",age:20.4},
+  {reg:"TC-JNC",type:"Airbus A330-200",config:"C18Y232",delivered:"May 2006",remark:"Retro cs",name:"Kushimoto",age:20},
+  {reg:"TC-JND",type:"Airbus A330-200",config:"C18Y232",delivered:"Jun 2006",remark:"",name:"Antalya",age:19.8},
+  {reg:"TC-JNE",type:"Airbus A330-200",config:"C18Y232",delivered:"Jul 2006",remark:"",name:"Kayseri",age:19.8},
+  // A321neo C16Y174
+  {reg:"TC-LPA",type:"Airbus A321neo",config:"C16Y174",delivered:"Aug 2023",remark:"",name:"",age:2.7},
+  {reg:"TC-LPB",type:"Airbus A321neo",config:"C16Y174",delivered:"Dec 2023",remark:"",name:"",age:2.3},
+  {reg:"TC-LPC",type:"Airbus A321neo",config:"C16Y174",delivered:"Feb 2024",remark:"",name:"",age:2.2},
+  {reg:"TC-LPD",type:"Airbus A321neo",config:"C16Y174",delivered:"Apr 2024",remark:"",name:"",age:2},
+  {reg:"TC-LPE",type:"Airbus A321neo",config:"C16Y174",delivered:"Jul 2024",remark:"lsd",name:"",age:1.8},
+  {reg:"TC-LPF",type:"Airbus A321neo",config:"C16Y174",delivered:"Jul 2024",remark:"",name:"",age:1.7},
+  {reg:"TC-LPG",type:"Airbus A321neo",config:"C16Y174",delivered:"Dec 2024",remark:"lsd",name:"",age:1.3},
+  {reg:"TC-LPH",type:"Airbus A321neo",config:"C16Y174",delivered:"Jul 2024",remark:"lsd",name:"",age:1.8},
+  {reg:"TC-LPI",type:"Airbus A321neo",config:"C16Y174",delivered:"Aug 2024",remark:"",name:"",age:1.7},
+  {reg:"TC-LPJ",type:"Airbus A321neo",config:"C16Y174",delivered:"Sep 2024",remark:"lsd",name:"",age:1.6},
+  // PAGE 6
+  {reg:"TC-LPK",type:"Airbus A321neo",config:"C16Y174",delivered:"Oct 2024",remark:"lsd",name:"",age:1.5},
+  {reg:"TC-LPL",type:"Airbus A321neo",config:"C16Y174",delivered:"Nov 2024",remark:"lsd",name:"",age:1.5},
+  {reg:"TC-LPM",type:"Airbus A321neo",config:"C16Y174",delivered:"Nov 2024",remark:"lsd",name:"",age:1.4},
+  {reg:"TC-LPN",type:"Airbus A321neo",config:"C16Y174",delivered:"Oct 2024",remark:"lsd",name:"",age:1.5},
+  {reg:"TC-LPO",type:"Airbus A321neo",config:"C16Y174",delivered:"Jan 2025",remark:"lsd",name:"",age:1.2},
+  {reg:"TC-LPP",type:"Airbus A321neo",config:"C16Y174",delivered:"Mar 2025",remark:"",name:"",age:1.2},
+  {reg:"TC-LPR",type:"Airbus A321neo",config:"C16Y174",delivered:"Jun 2025",remark:"lsd",name:"",age:0.9},
+  {reg:"TC-LPS",type:"Airbus A321neo",config:"C16Y174",delivered:"Aug 2025",remark:"lsd",name:"",age:0.7},
+  {reg:"TC-LPT",type:"Airbus A321neo",config:"C16Y174",delivered:"Oct 2025",remark:"lsd",name:"",age:0.5},
+  {reg:"TC-LPU",type:"Airbus A321neo",config:"C16Y174",delivered:"Nov 2025",remark:"",name:"",age:0.5},
+  {reg:"TC-LPV",type:"Airbus A321neo",config:"C16Y174",delivered:"Nov 2025",remark:"Parked at ISL, lsd",name:"",age:0.4},
+  {reg:"TC-LPY",type:"Airbus A321neo",config:"C16Y174",delivered:"Nov 2025",remark:"lsd",name:"",age:0.4},
+  {reg:"TC-LPZ",type:"Airbus A321neo",config:"C16Y174",delivered:"Jan 2026",remark:"",name:"",age:0.3},
+  {reg:"TC-LRA",type:"Airbus A321neo",config:"C16Y174",delivered:"Dec 2025",remark:"Parked at ISL, lsd",name:"",age:0.3},
+  {reg:"TC-LRB",type:"Airbus A321neo",config:"C16Y174",delivered:"Feb 2026",remark:"Parked at ISL, lsd",name:"",age:0.2},
+  {reg:"TC-LRC",type:"Airbus A321neo",config:"C16Y174",delivered:"Feb 2026",remark:"Parked / Maintenance, lsd",name:"Brand new",age:0},
+  {reg:"TC-LRD",type:"Airbus A321neo",config:"C16Y174",delivered:"Jan 2026",remark:"Parked at ISL, lsd",name:"",age:0.3},
+  {reg:"TC-LRE",type:"Airbus A321neo",config:"C16Y174",delivered:"On Order",remark:"",name:"",age:0,onOrder:true},
+  {reg:"TC-LRF",type:"Airbus A321neo",config:"C16Y174",delivered:"On Order",remark:"",name:"",age:0,onOrder:true},
+  // A321-200 C16Y164
+  {reg:"TC-JRM",type:"Airbus A321-200",config:"C16Y164",delivered:"Mar 2011",remark:"",name:"Afyonkarahisar",age:15.1},
+  {reg:"TC-JRN",type:"Airbus A321-200",config:"C16Y164",delivered:"Mar 2011",remark:"",name:"Sarıyer",age:15.1},
+  {reg:"TC-JRO",type:"Airbus A321-200",config:"C16Y164",delivered:"Apr 2011",remark:"Star Alliance cs",name:"Uludağ",age:15},
+  {reg:"TC-JRP",type:"Airbus A321-200",config:"C16Y164",delivered:"May 2011",remark:"Star Alliance cs",name:"Ürgüp",age:15},
+  {reg:"TC-JRR",type:"Airbus A321-200",config:"C16Y164",delivered:"May 2011",remark:"Star Alliance cs",name:"Emirgan",age:15},
+  {reg:"TC-JRS",type:"Airbus A321-200",config:"C16Y164",delivered:"Jun 2011",remark:"Star Alliance cs",name:"Datça",age:14.8},
+  {reg:"TC-JRT",type:"Airbus A321-200",config:"C16Y164",delivered:"Jul 2011",remark:"",name:"Alaçatı",age:14.8},
+  {reg:"TC-JRU",type:"Airbus A321-200",config:"C16Y164",delivered:"Aug 2011",remark:"",name:"Florya",age:14.7},
+  {reg:"TC-JRV",type:"Airbus A321-200",config:"C16Y164",delivered:"Mar 2012",remark:"",name:"Ümraniye",age:14.1},
+  {reg:"TC-JRY",type:"Airbus A321-200",config:"C16Y164",delivered:"Mar 2012",remark:"Star Alliance cs",name:"Beyoğlu",age:14.1},
+  {reg:"TC-JRZ",type:"Airbus A321-200",config:"C16Y164",delivered:"Apr 2012",remark:"",name:"Maltepe",age:14},
+  {reg:"TC-JSA",type:"Airbus A321-200",config:"C16Y164",delivered:"May 2012",remark:"",name:"Gaziosmanpaşa",age:13.9},
+  {reg:"TC-JSB",type:"Airbus A321-200",config:"C16Y164",delivered:"Jun 2012",remark:"",name:"Mut",age:13.8},
+  {reg:"TC-JSC",type:"Airbus A321-200",config:"C16Y164",delivered:"Aug 2012",remark:"",name:"Arnavutköy",age:13.7},
+  {reg:"TC-JSD",type:"Airbus A321-200",config:"C16Y164",delivered:"Dec 2012",remark:"",name:"Kız Kulesi",age:13.4},
+  {reg:"TC-JSE",type:"Airbus A321-200",config:"C16Y164",delivered:"Jan 2013",remark:"",name:"Kızılırmak",age:13.2},
+  {reg:"TC-JSF",type:"Airbus A321-200",config:"C16Y164",delivered:"Feb 2013",remark:"",name:"Niğde",age:13.2},
+  {reg:"TC-JSG",type:"Airbus A321-200",config:"C16Y164",delivered:"Mar 2013",remark:"Star Alliance cs",name:"Ordu",age:13.1},
+  {reg:"TC-JSI",type:"Airbus A321-200",config:"C16Y164",delivered:"May 2013",remark:"",name:"Tunceli",age:13},
+  {reg:"TC-JSJ",type:"Airbus A321-200",config:"C16Y164",delivered:"Jul 2013",remark:"",name:"Keçiören",age:12.8},
+  {reg:"TC-JSK",type:"Airbus A321-200",config:"C16Y164",delivered:"Jun 2013",remark:"",name:"Kula",age:12.8},
+  {reg:"TC-JSL",type:"Airbus A321-200",config:"C16Y164",delivered:"Jun 2013",remark:"",name:"Kulu",age:12.8},
+  {reg:"TC-JSM",type:"Airbus A321-200",config:"C16Y164",delivered:"Jul 2013",remark:"",name:"Ayder",age:12.8},
+  {reg:"TC-JSN",type:"Airbus A321-200",config:"C16Y164",delivered:"Mar 2015",remark:"",name:"Yüksekova",age:11.1},
+  {reg:"TC-JSO",type:"Airbus A321-200",config:"C16Y164",delivered:"Apr 2015",remark:"",name:"Gümüşhane",age:11},
+  {reg:"TC-JSP",type:"Airbus A321-200",config:"C16Y164",delivered:"May 2015",remark:"",name:"Şırnak",age:10.9},
+  {reg:"TC-JSR",type:"Airbus A321-200",config:"C16Y164",delivered:"Jun 2015",remark:"",name:"Kırklareli",age:10.8},
+  {reg:"TC-JSS",type:"Airbus A321-200",config:"C16Y164",delivered:"Jul 2015",remark:"",name:"Düzce",age:10.8},
+  {reg:"TC-JST",type:"Airbus A321-200",config:"C16Y164",delivered:"Jul 2015",remark:"",name:"Sinop",age:10.8},
+  {reg:"TC-JSU",type:"Airbus A321-200",config:"C16Y164",delivered:"Aug 2015",remark:"",name:"Kalecik",age:10.7},
+  {reg:"TC-JSV",type:"Airbus A321-200",config:"C16Y164",delivered:"Aug 2015",remark:"",name:"Ilgın",age:10.7},
+  {reg:"TC-JSY",type:"Airbus A321-200",config:"C16Y164",delivered:"Aug 2015",remark:"",name:"Merzifon",age:10.6},
+  {reg:"TC-JSZ",type:"Airbus A321-200",config:"C16Y164",delivered:"Sep 2015",remark:"",name:"Fatih",age:10.6},
+  // PAGE 7
+  {reg:"TC-JTA",type:"Airbus A321-200",config:"C16Y164",delivered:"Sep 2015",remark:"",name:"Gelibolu",age:10.6},
+  {reg:"TC-JTD",type:"Airbus A321-200",config:"C16Y164",delivered:"Oct 2015",remark:"",name:"Çankaya",age:10.5},
+  {reg:"TC-JTE",type:"Airbus A321-200",config:"C16Y164",delivered:"Nov 2015",remark:"",name:"Polatlı",age:10.4},
+  {reg:"TC-JTF",type:"Airbus A321-200",config:"C16Y164",delivered:"Feb 2016",remark:"",name:"Ataşehir",age:10.2},
+  {reg:"TC-JTG",type:"Airbus A321-200",config:"C16Y164",delivered:"Feb 2016",remark:"",name:"Avcılar",age:10.2},
+  {reg:"TC-JTH",type:"Airbus A321-200",config:"C16Y164",delivered:"Mar 2016",remark:"",name:"Ayvacık",age:10.1},
+  {reg:"TC-JTI",type:"Airbus A321-200",config:"C16Y164",delivered:"Apr 2016",remark:"",name:"Büyükçekmece",age:10},
+  {reg:"TC-JTJ",type:"Airbus A321-200",config:"C16Y164",delivered:"May 2016",remark:"",name:"Küçükçekmece",age:9.9},
+  {reg:"TC-JTK",type:"Airbus A321-200",config:"C16Y164",delivered:"May 2016",remark:"",name:"Görele",age:9.9},
+  {reg:"TC-JTL",type:"Airbus A321-200",config:"C16Y164",delivered:"Jun 2016",remark:"",name:"Çengelköy",age:9.8},
+  {reg:"TC-JTM",type:"Airbus A321-200",config:"C16Y164",delivered:"Jul 2016",remark:"",name:"Saraçhane",age:9.8},
+  {reg:"TC-JTN",type:"Airbus A321-200",config:"C16Y164",delivered:"Aug 2016",remark:"",name:"Köyceğiz",age:9.7},
+  {reg:"TC-JTO",type:"Airbus A321-200",config:"C16Y164",delivered:"Sep 2016",remark:"",name:"Silivri",age:9.6},
+  {reg:"TC-JTP",type:"Airbus A321-200",config:"C16Y164",delivered:"Jan 2017",remark:"lsd",name:"Çanakkale",age:9.2},
+  {reg:"TC-JTR",type:"Airbus A321-200",config:"C16Y164",delivered:"Jan 2017",remark:"lsd",name:"Bahçelievler",age:9.2},
+  // B737-900ER
+  {reg:"TC-JYL",type:"Boeing 737-900ER",config:"C16Y153",delivered:"Feb 2015",remark:"",name:"Çorlu",age:11.2},
+  {reg:"TC-JYM",type:"Boeing 737-900ER",config:"C16Y153",delivered:"Mar 2015",remark:"",name:"İnceburun",age:11.1},
+  {reg:"TC-JYN",type:"Boeing 737-900ER",config:"C16Y153",delivered:"Apr 2015",remark:"",name:"Kanlıca",age:11},
+  {reg:"TC-JYO",type:"Boeing 737-900ER",config:"C16Y153",delivered:"May 2015",remark:"lsd",name:"Ilıca",age:11},
+  {reg:"TC-JYP",type:"Boeing 737-900ER",config:"C16Y153",delivered:"Jul 2015",remark:"",name:"Çatalca",age:10.8},
+  // B737 MAX 9
+  {reg:"TC-LYA",type:"Boeing 737 MAX 9",config:"C16Y153",delivered:"Feb 2019",remark:"",name:"",age:7.2},
+  {reg:"TC-LYB",type:"Boeing 737 MAX 9",config:"C16Y153",delivered:"Jun 2021",remark:"",name:"Akçaabat",age:7.1},
+  {reg:"TC-LYC",type:"Boeing 737 MAX 9",config:"C16Y153",delivered:"Nov 2021",remark:"",name:"",age:6.8},
+  {reg:"TC-LYD",type:"Boeing 737 MAX 9",config:"C16Y153",delivered:"Sep 2021",remark:"",name:"",age:7},
+  {reg:"TC-LYE",type:"Boeing 737 MAX 9",config:"C16Y153",delivered:"Sep 2021",remark:"",name:"",age:6.9},
+  // B737-800
+  {reg:"TC-JHK",type:"Boeing 737-800",config:"C16Y135",delivered:"Nov 2011",remark:"",name:"Ardahan",age:14.5},
+  {reg:"TC-JHL",type:"Boeing 737-800",config:"C16Y135",delivered:"Dec 2011",remark:"",name:"Kemah",age:14.4},
+  {reg:"TC-JHM",type:"Boeing 737-800",config:"C16Y135",delivered:"May 2012",remark:"",name:"Burgaz",age:13.9},
+  {reg:"TC-JHN",type:"Boeing 737-800",config:"C16Y135",delivered:"Jun 2012",remark:"",name:"Yeşilırmak",age:13.8},
+  {reg:"TC-JHO",type:"Boeing 737-800",config:"C16Y135",delivered:"Jan 2013",remark:"",name:"Köprübaşı",age:13.2},
+  {reg:"TC-JHP",type:"Boeing 737-800",config:"C16Y135",delivered:"Feb 2013",remark:"",name:"Dicle",age:13.2},
+  {reg:"TC-JHR",type:"Boeing 737-800",config:"C16Y135",delivered:"Mar 2013",remark:"",name:"Manisa",age:13.1},
+  {reg:"TC-JHS",type:"Boeing 737-800",config:"C16Y135",delivered:"Apr 2013",remark:"",name:"Gölbaşı",age:13},
+  {reg:"TC-JHT",type:"Boeing 737-800",config:"C16Y135",delivered:"Apr 2013",remark:"",name:"Bingöl",age:13},
+  {reg:"TC-JHU",type:"Boeing 737-800",config:"C16Y135",delivered:"May 2013",remark:"Parked / Maintenance",name:"Amasra",age:13},
+  {reg:"TC-JHV",type:"Boeing 737-800",config:"C16Y135",delivered:"Feb 2014",remark:"",name:"Keban",age:12.2},
+  {reg:"TC-JHY",type:"Boeing 737-800",config:"C16Y135",delivered:"Feb 2014",remark:"",name:"Mengen",age:12.2},
+  {reg:"TC-JHZ",type:"Boeing 737-800",config:"C16Y135",delivered:"Mar 2014",remark:"",name:"İznik",age:12.1},
+  {reg:"TC-JVA",type:"Boeing 737-800",config:"C16Y135",delivered:"Mar 2014",remark:"",name:"Sultanbeyli",age:12.1},
+  {reg:"TC-JVB",type:"Boeing 737-800",config:"C16Y135",delivered:"Apr 2014",remark:"",name:"Sultangazi",age:12},
+  {reg:"TC-JVC",type:"Boeing 737-800",config:"C16Y135",delivered:"Apr 2014",remark:"",name:"Şahinbey",age:12},
+  {reg:"TC-JVD",type:"Boeing 737-800",config:"C16Y135",delivered:"May 2014",remark:"",name:"Şile",age:12},
+  {reg:"TC-JVE",type:"Boeing 737-800",config:"C16Y135",delivered:"May 2014",remark:"",name:"Kartal",age:11.9},
+  {reg:"TC-JVF",type:"Boeing 737-800",config:"C16Y135",delivered:"Jun 2014",remark:"",name:"Pendik",age:11.9},
+  {reg:"TC-JVG",type:"Boeing 737-800",config:"C16Y135",delivered:"Jun 2014",remark:"",name:"İkizdere",age:11.8},
+  {reg:"TC-JVH",type:"Boeing 737-800",config:"C16Y135",delivered:"Jan 2016",remark:"",name:"Marmaris",age:10.3},
+  {reg:"TC-JVI",type:"Boeing 737-800",config:"C16Y135",delivered:"Feb 2016",remark:"",name:"Bağcılar",age:10.2},
+  {reg:"TC-JVJ",type:"Boeing 737-800",config:"C16Y135",delivered:"Feb 2016",remark:"",name:"Başakşehir",age:10.2},
+  {reg:"TC-JVK",type:"Boeing 737-800",config:"C16Y135",delivered:"Feb 2016",remark:"",name:"Bayrampaşa",age:10.2},
+  {reg:"TC-JVL",type:"Boeing 737-800",config:"C16Y135",delivered:"Mar 2016",remark:"",name:"Eyüpsultan",age:10.1},
+  {reg:"TC-JVM",type:"Boeing 737-800",config:"C16Y135",delivered:"Mar 2016",remark:"",name:"Zeytinburnu",age:10.1},
+  {reg:"TC-JVN",type:"Boeing 737-800",config:"C16Y135",delivered:"Apr 2016",remark:"lsd",name:"Beylikdüzü",age:10},
+  // PAGE 8
+  {reg:"TC-JVO",type:"Boeing 737-800",config:"C16Y135",delivered:"Apr 2016",remark:"",name:"Tuzla",age:10},
+  {reg:"TC-JVP",type:"Boeing 737-800",config:"C16Y135",delivered:"Apr 2016",remark:"",name:"Esenyurt",age:10},
+  {reg:"TC-JVR",type:"Boeing 737-800",config:"C16Y135",delivered:"May 2016",remark:"",name:"Kağıthane",age:10},
+  {reg:"TC-JVS",type:"Boeing 737-800",config:"C16Y135",delivered:"May 2016",remark:"lsd",name:"Güngören",age:9.9},
+  {reg:"TC-JVT",type:"Boeing 737-800",config:"C16Y135",delivered:"May 2016",remark:"",name:"Çekmeköy",age:9.9},
+  {reg:"TC-JVU",type:"Boeing 737-800",config:"C16Y135",delivered:"Jun 2016",remark:"",name:"Sancaktepe",age:9.9},
+  {reg:"TC-JVV",type:"Boeing 737-800",config:"C16Y135",delivered:"Jun 2016",remark:"",name:"Acıbadem",age:9.8},
+  {reg:"TC-JVY",type:"Boeing 737-800",config:"C16Y135",delivered:"Jul 2016",remark:"",name:"Kahramankazan",age:9.8},
+  {reg:"TC-JVZ",type:"Boeing 737-800",config:"C16Y135",delivered:"Jul 2016",remark:"6000th Boeing NG sticker",name:"Beştepe",age:9.8},
+  // B737-900ER C16Y135
+  {reg:"TC-JYA",type:"Boeing 737-900ER",config:"C16Y135",delivered:"Dec 2011",remark:"Parked / Maintenance",name:"Selçuk",age:14.9},
+  {reg:"TC-JYB",type:"Boeing 737-900ER",config:"C16Y135",delivered:"Dec 2011",remark:"",name:"Denizli",age:14.8},
+  {reg:"TC-JYC",type:"Boeing 737-900ER",config:"C16Y135",delivered:"May 2012",remark:"",name:"Ereğli",age:14.2},
+  {reg:"TC-JYD",type:"Boeing 737-900ER",config:"C16Y135",delivered:"Jun 2012",remark:"",name:"Bayburt",age:14},
+  {reg:"TC-JYE",type:"Boeing 737-900ER",config:"C16Y135",delivered:"Jul 2012",remark:"",name:"Tuz Gölü",age:13.9},
+  {reg:"TC-JYF",type:"Boeing 737-900ER",config:"C16Y135",delivered:"Sep 2012",remark:"",name:"Çırağan",age:13.8},
+  {reg:"TC-JYG",type:"Boeing 737-900ER",config:"C16Y135",delivered:"Sep 2012",remark:"",name:"Ünye",age:13.8},
+  {reg:"TC-JYH",type:"Boeing 737-900ER",config:"C16Y135",delivered:"Oct 2012",remark:"",name:"Of",age:13.7},
+  {reg:"TC-JYI",type:"Boeing 737-900ER",config:"C16Y135",delivered:"Nov 2012",remark:"",name:"Muğla",age:13.6},
+  {reg:"TC-JYJ",type:"Boeing 737-900ER",config:"C16Y135",delivered:"Mar 2013",remark:"",name:"Emirdağ",age:13.3},
+  // B737-800 more
+  {reg:"TC-JZE",type:"Boeing 737-800",config:"C16Y135",delivered:"Aug 2016",remark:"",name:"Çaykara",age:9.6},
+  {reg:"TC-JZF",type:"Boeing 737-800",config:"C16Y135",delivered:"Aug 2016",remark:"",name:"Safranbolu",age:9.7},
+  {reg:"TC-JZG",type:"Boeing 737-800",config:"C16Y135",delivered:"Oct 2021",remark:"Parked / Maintenance",name:"",age:9.6},
+  {reg:"TC-JZH",type:"Boeing 737-800",config:"C16Y135",delivered:"Sep 2016",remark:"",name:"Beykoz",age:9.6},
+  // B737 MAX 8
+  {reg:"TC-LCA",type:"Boeing 737 MAX 8",config:"C16Y135",delivered:"Aug 2018",remark:"Parked / Maintenance",name:"Tokat",age:7.7},
+  {reg:"TC-LCB",type:"Boeing 737 MAX 8",config:"C16Y135",delivered:"Nov 2018",remark:"",name:"Isparta",age:7.4},
+  {reg:"TC-LCC",type:"Boeing 737 MAX 8",config:"C16Y135",delivered:"Nov 2018",remark:"Parked / Maintenance",name:"Karaman",age:7.5},
+  {reg:"TC-LCD",type:"Boeing 737 MAX 8",config:"C16Y135",delivered:"Sep 2018",remark:"",name:"Kırşehir",age:7.6},
+  {reg:"TC-LCE",type:"Boeing 737 MAX 8",config:"C16Y135",delivered:"Nov 2018",remark:"",name:"Bartın",age:7.4},
+  {reg:"TC-LCF",type:"Boeing 737 MAX 8",config:"C16Y135",delivered:"Sep 2018",remark:"",name:"Muş",age:7.6},
+  {reg:"TC-LCG",type:"Boeing 737 MAX 8",config:"C16Y135",delivered:"Dec 2018",remark:"",name:"Hakkari",age:7.4},
+  {reg:"TC-LCH",type:"Boeing 737 MAX 8",config:"C16Y135",delivered:"Oct 2021",remark:"",name:"",age:6.8},
+  {reg:"TC-LCI",type:"Boeing 737 MAX 8",config:"C16Y135",delivered:"Jan 2022",remark:"",name:"",age:6.7},
+  {reg:"TC-LCJ",type:"Boeing 737 MAX 8",config:"C16Y135",delivered:"Feb 2019",remark:"",name:"",age:7.2},
+  {reg:"TC-LCK",type:"Boeing 737 MAX 8",config:"C16Y135",delivered:"Feb 2019",remark:"",name:"Taş Tepeler",age:7.2},
+  {reg:"TC-LCL",type:"Boeing 737 MAX 8",config:"C16Y135",delivered:"Feb 2019",remark:"",name:"",age:7.2},
+  {reg:"TC-LCM",type:"Boeing 737 MAX 8",config:"C16Y135",delivered:"Feb 2019",remark:"",name:"",age:7.2},
+  {reg:"TC-LCN",type:"Boeing 737 MAX 8",config:"C16Y135",delivered:"Jun 2021",remark:"",name:"",age:7.1},
+  {reg:"TC-LCO",type:"Boeing 737 MAX 8",config:"C16Y135",delivered:"Jun 2021",remark:"",name:"",age:7.1},
+  {reg:"TC-LCP",type:"Boeing 737 MAX 8",config:"C16Y135",delivered:"Jun 2021",remark:"",name:"",age:7},
+  {reg:"TC-LCR",type:"Boeing 737 MAX 8",config:"C16Y135",delivered:"Aug 2021",remark:"",name:"",age:7},
+  {reg:"TC-LCS",type:"Boeing 737 MAX 8",config:"C16Y135",delivered:"Sep 2021",remark:"",name:"",age:6.9},
+  {reg:"TC-LCT",type:"Boeing 737 MAX 8",config:"C16Y135",delivered:"Sep 2021",remark:"",name:"",age:6.9},
+  {reg:"TC-LCU",type:"Boeing 737 MAX 8",config:"C16Y135",delivered:"Sep 2021",remark:"",name:"",age:4.6},
+  // Special
+  {reg:"TC-LKF",type:"Boeing 777-300ER",config:"C14Y478",delivered:"Apr 2024",remark:"lsd",name:"",age:18.9},
+  {reg:"TC-LKD",type:"Boeing 777-300ER",config:"C7YS24",delivered:"Mar 2026",remark:"lsd",name:"",age:16.9},
+  {reg:"TC-LKE",type:"Boeing 777-300ER",config:"C7YS24",delivered:"Mar 2026",remark:"Parked / Maintenance, lsd",name:"",age:19.1},
+  {reg:"TC-JMP",type:"Airbus A321-200",config:"",delivered:"Jan 2026",remark:"lsd",name:"",age:14.2},
+  // On Order
+  {reg:"TC-LHK",type:"Airbus A350-900",config:"",delivered:"On Order",remark:"Brand new",name:"",age:0,onOrder:true},
+  {reg:"TC-",type:"Airbus A321neo",config:"",delivered:"On Order",remark:"",name:"",age:0,onOrder:true},
+  {reg:"TC-",type:"Airbus A321neo",config:"",delivered:"On Order",remark:"",name:"",age:0,onOrder:true},
+  {reg:"TC-",type:"Airbus A350-900",config:"",delivered:"On Order",remark:"",name:"",age:0,onOrder:true},
+];
+
+const maxAge = Math.max(...fleetData.filter(a=>!a.onOrder).map(a=>a.age));
+
+function getRemarkClass(remark) {
+  if (!remark) return '';
+  const r = remark.toLowerCase();
+  if (r.includes('parked') || r.includes('maintenance')) return 'parked';
+  if (r.includes('opf turkish cargo') || r.includes('cargo')) return 'cargo';
+  if (r.includes('star alliance') || r.includes('special') || r.includes('cs') || r.includes('retro') || r.includes('bio fuel') || r.includes('anniversary') || r.includes('türkiye') || r.includes('500th') || r.includes('400th') || r.includes('6000th') || r.includes('holidays')) return 'special';
+  if (r.includes('on order')) return 'order';
+  if (r.includes('lsd') || r.includes('isd')) return 'order';
+  return '';
+}
+
+function getTypeKey(type) {
+  if (type.includes('A319')) return 'A319';
+  if (type.includes('A320')) return 'A320';
+  if (type.includes('A321neo')) return 'A321neo';
+  if (type.includes('A321')) return 'A321';
+  if (type.includes('A330')) return 'A330';
+  if (type.includes('A350')) return 'A350';
+  if (type.includes('777F') || type.includes('A330-200F')) return 'Cargo';
+  if (type.includes('737')) return 'B737';
+  if (type.includes('777')) return 'B777';
+  if (type.includes('787')) return 'B787';
+  return 'Other';
+}
+
+let currentFilter = 'all';
+let currentSearch = '';
+let sortCol = 'type';
+let sortDir = 1;
+
+function getFilteredData() {
+  return fleetData.filter(a => {
+    const typeKey = getTypeKey(a.type);
+    const matchFilter = currentFilter === 'all' || typeKey === currentFilter || (currentFilter === 'Cargo' && a.config === 'Cargo');
+    const q = currentSearch.toLowerCase();
+    const matchSearch = !q ||
+      a.reg.toLowerCase().includes(q) ||
+      a.type.toLowerCase().includes(q) ||
+      (a.name && a.name.toLowerCase().includes(q)) ||
+      a.config.toLowerCase().includes(q) ||
+      (a.remark && a.remark.toLowerCase().includes(q));
+    return matchFilter && matchSearch;
+  });
+}
+
+function render() {
+  const data = getFilteredData();
+  const sorted = [...data].sort((a,b) => {
+    let av = a[sortCol] ?? '', bv = b[sortCol] ?? '';
+    if (sortCol === 'age') { av = a.age; bv = b.age; }
+    if (av < bv) return -sortDir;
+    if (av > bv) return sortDir;
+    return 0;
+  });
+
+  const tbody = document.getElementById('fleet-body');
+  tbody.innerHTML = '';
+
+  let lastType = '';
+  sorted.forEach(ac => {
+    const tk = getTypeKey(ac.type);
+    if (ac.type !== lastType && sortCol === 'type') {
+      const hr = document.createElement('tr');
+      hr.className = 'type-header';
+      hr.innerHTML = `<td colspan="7">✈ ${ac.type}</td>`;
+      tbody.appendChild(hr);
+      lastType = ac.type;
+    }
+
+    const tr = document.createElement('tr');
+    if (ac.onOrder) tr.classList.add('on-order');
+    if (!ac.onOrder) {
+      tr.dataset.reg = ac.reg;
+      tr.addEventListener('click', () => openPanel(ac));
+    }
+
+    const ageBarPct = ac.age > 0 ? Math.min(100, (ac.age / maxAge) * 100) : 0;
+    const remarkClass = getRemarkClass(ac.remark || '');
+    const ageColor = ac.age > 15 ? '#e8a020' : ac.age < 2 ? '#5b9bd5' : '#E31837';
+
+    tr.innerHTML = `
+      <td><span class="reg">${ac.reg}</span></td>
+      <td class="aircraft-type">${ac.type}</td>
+      <td><span class="config-badge">${ac.config}</span></td>
+      <td class="delivered">${ac.delivered}</td>
+      <td><span class="remark ${remarkClass}">${ac.remark || '—'}</span></td>
+      <td class="aircraft-name">${ac.name || '—'}</td>
+      <td>
+        <div class="age-bar-wrap">
+          <span class="age-val">${ac.age > 0 ? ac.age.toFixed(1) + ' yr' : ac.onOrder ? 'order' : '—'}</span>
+          <div class="age-bar"><div class="age-fill" style="width:${ageBarPct}%;background:${ageColor}"></div></div>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  const shownActive = sorted.filter(a=>!a.onOrder).length;
+  document.getElementById('shown-count').textContent = shownActive;
+
+  // Update header stats
+  const active = fleetData.filter(a => !a.onOrder);
+  const types = new Set(active.map(a => a.type));
+  const avgAge = (active.reduce((s,a) => s + a.age, 0) / active.length).toFixed(1);
+  document.getElementById('total-count').textContent = active.length;
+  document.getElementById('type-count').textContent = types.size;
+  document.getElementById('avg-age').textContent = avgAge;
+  // Mobile stats
+  document.getElementById('total-count-m').textContent = active.length;
+  document.getElementById('type-count-m').textContent = types.size;
+  document.getElementById('avg-age-m').textContent = avgAge;
+
+  // Mobile card view
+  const cardView = document.getElementById('card-view');
+  cardView.innerHTML = '';
+  sorted.forEach(ac => {
+    const remarkClass = getRemarkClass(ac.remark || '');
+    const ageColor = ac.age > 15 ? '#e8a020' : ac.age < 2 ? '#5b9bd5' : 'var(--red)';
+    const card = document.createElement('div');
+    card.className = 'aircraft-card' + (ac.onOrder ? ' on-order' : '');
+    card.style.borderLeftColor = ac.onOrder ? 'var(--muted)' : ageColor;
+    if (!ac.onOrder) {
+      card.dataset.reg = ac.reg;
+      card.addEventListener('click', () => openPanel(ac));
+    }
+    card.innerHTML = `
+      <div class="card-top">
+        <span class="card-reg">${ac.reg}</span>
+        <span class="card-age">${ac.age > 0 ? ac.age.toFixed(1) + ' yr' : ac.onOrder ? 'On Order' : '—'}</span>
+      </div>
+      <div class="card-type">${ac.type}</div>
+      ${ac.name ? `<div class="card-name">✦ ${ac.name}</div>` : ''}
+      <div class="card-meta">
+        ${ac.config ? `<span class="card-tag">${ac.config}</span>` : ''}
+        <span class="card-tag">${ac.delivered}</span>
+        ${ac.remark ? `<span class="card-tag card-remark ${remarkClass}">${ac.remark}</span>` : ''}
+      </div>
+    `;
+    cardView.appendChild(card);
+  });
+}
+
+// Filter buttons
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    render();
+  });
+});
+
+// Search
+document.getElementById('search').addEventListener('input', e => {
+  currentSearch = e.target.value;
+  render();
+});
+
+// Sort
+document.querySelectorAll('thead th').forEach(th => {
+  th.addEventListener('click', () => {
+    const col = th.dataset.col;
+    if (sortCol === col) sortDir *= -1;
+    else { sortCol = col; sortDir = 1; }
+    document.querySelectorAll('thead th').forEach(t => t.classList.remove('sorted'));
+    th.classList.add('sorted');
+    render();
+  });
+});
+
+// ─── PHOTO PANEL ──────────────────────────────────────────────
+const panel      = document.getElementById('photo-panel');
+const overlay    = document.getElementById('panel-overlay');
+const panelBody  = document.getElementById('panel-body');
+const panelReg   = document.getElementById('panel-reg');
+const panelSub   = document.getElementById('panel-subtype');
+const panelClose = document.getElementById('panel-close');
+
+let currentPhotos = [];
+let activePhotoIdx = 0;
+let selectedReg = null;
+
+function openPanel(ac) {
+  selectedReg = ac.reg;
+  panelReg.textContent = ac.reg;
+  panelSub.textContent = ac.type + (ac.name ? ' — ' + ac.name : '');
+  panel.classList.add('open');
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  loadPhotos(ac);
+  // Highlight row/card
+  document.querySelectorAll('tbody tr.selected-row').forEach(r => r.classList.remove('selected-row'));
+  document.querySelectorAll('.aircraft-card.selected-card').forEach(c => c.classList.remove('selected-card'));
+  document.querySelectorAll(`[data-reg="${ac.reg}"]`).forEach(el => {
+    el.classList.add(el.tagName === 'TR' ? 'selected-row' : 'selected-card');
+  });
+}
+
+function closePanel() {
+  panel.classList.remove('open');
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+  selectedReg = null;
+  document.querySelectorAll('.selected-row').forEach(r => r.classList.remove('selected-row'));
+  document.querySelectorAll('.selected-card').forEach(c => c.classList.remove('selected-card'));
+}
+
+panelClose.addEventListener('click', closePanel);
+overlay.addEventListener('click', closePanel);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
+
+async function loadPhotos(ac) {
+  // iframe içinde çalışıyorsak direkt Planespotters'a yönlendir
+  const inIframe = window.self !== window.top;
+
+  panelBody.innerHTML = `
+    <div class="panel-loading">
+      <div class="spinner"></div>
+      <div class="panel-loading-text">FOTOĞRAF YÜKLENİYOR...</div>
+    </div>`;
+
+  if (inIframe) {
+    // CORS engeli — fotoğrafları yeni sekmede aç
+    const regClean = ac.reg.replace('-','');
+    panelBody.innerHTML = buildInfoOnly(ac) + `
+      <div style="padding:0 20px 20px">
+        <a class="panel-link" href="https://www.planespotters.net/photos/reg/${ac.reg}" target="_blank" rel="noopener"
+          style="display:flex;align-items:center;gap:10px;justify-content:center;padding:14px">
+          📷 Fotoğrafları Planespotters'da Aç ↗
+        </a>
+        <a class="panel-link" href="https://www.planespotters.net/aircraft/${regClean}" target="_blank" rel="noopener"
+          style="display:flex;align-items:center;gap:10px;justify-content:center;padding:14px;margin-top:8px">
+          ✈ Uçak Detayları ↗
+        </a>
+      </div>`;
+    return;
+  }
+
+  try {
+    const url = `https://api.planespotters.net/pub/photos/reg/${encodeURIComponent(ac.reg)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    currentPhotos = data.photos || [];
+    activePhotoIdx = 0;
+    renderPanel(ac);
+  } catch(e) {
+    panelBody.innerHTML = buildInfoOnly(ac) + `
+      <div class="panel-no-photo">
+        <div class="no-photo-icon">📡</div>
+        <div>API'ye ulaşılamadı.<br>İnternet bağlantısını kontrol et.</div>
+      </div>`;
+  }
+}
+
+function renderPanel(ac) {
+  const photo = currentPhotos[activePhotoIdx];
+
+  let photoHTML = '';
+  if (currentPhotos.length === 0) {
+    photoHTML = `
+      <div class="panel-no-photo" style="padding:40px 20px">
+        <div class="no-photo-icon">✈</div>
+        <div>Bu uçak için fotoğraf bulunamadı.</div>
+      </div>`;
+  } else {
+    const imgSrc = photo.thumbnail_large?.src || photo.thumbnail?.src || '';
+    const photographer = photo.photographer || '';
+    const location = [photo.airport?.name, photo.airport?.country_name].filter(Boolean).join(', ');
+    const date = photo.date_taken ? photo.date_taken.substring(0,10) : '';
+    const photoUrl = photo.link || `https://www.planespotters.net/photo/${photo.id}`;
+
+    photoHTML = `
+      <div class="panel-photo-wrap">
+        <img id="main-photo" src="${imgSrc}" alt="${ac.reg}" loading="lazy">
+        <div class="panel-photo-credit">
+          ${photographer ? `📷 ${photographer}` : ''}
+          ${location ? ` · ${location}` : ''}
+          ${date ? ` · ${date}` : ''}
+          &nbsp;<a href="${photoUrl}" target="_blank" rel="noopener">Planespotters ↗</a>
+        </div>
+      </div>`;
+
+    // Thumbnails if more than 1
+    if (currentPhotos.length > 1) {
+      const thumbs = currentPhotos.slice(0, 9).map((p, i) => {
+        const tsrc = p.thumbnail?.src || '';
+        return `<div class="photo-thumb ${i === activePhotoIdx ? 'active' : ''}" data-idx="${i}">
+          <img src="${tsrc}" alt="" loading="lazy">
+        </div>`;
+      }).join('');
+      photoHTML += `<div class="photo-grid">${thumbs}</div>`;
+    }
+  }
+
+  panelBody.innerHTML = photoHTML + buildInfoOnly(ac) + `
+    <a class="panel-link" href="https://www.planespotters.net/aircraft/${ac.reg.replace('-','')}" target="_blank" rel="noopener">
+      ✈ Planespotters'da Görüntüle ↗
+    </a>`;
+
+  // Thumb click handlers
+  panelBody.querySelectorAll('.photo-thumb').forEach(thumb => {
+    thumb.addEventListener('click', () => {
+      activePhotoIdx = parseInt(thumb.dataset.idx);
+      renderPanel(ac);
+    });
+  });
+}
+
+function buildInfoOnly(ac) {
+  const ageColor = ac.age > 15 ? '#e8a020' : ac.age < 2 ? '#5b9bd5' : 'var(--red)';
+  return `
+  <div class="panel-info">
+    ${ac.name ? `<div class="panel-aircraft-name">${ac.name}</div>` : ''}
+    <div class="panel-type">${ac.type}</div>
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="info-label">Tescil</div>
+        <div class="info-value red">${ac.reg}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Yaş</div>
+        <div class="info-value" style="color:${ageColor}">${ac.age > 0 ? ac.age.toFixed(1) + ' yıl' : ac.onOrder ? 'Sipariş' : '—'}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Konfigürasyon</div>
+        <div class="info-value">${ac.config || '—'}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Teslim</div>
+        <div class="info-value">${ac.delivered || '—'}</div>
+      </div>
+      ${ac.remark ? `
+      <div class="info-item" style="grid-column:1/-1">
+        <div class="info-label">Açıklama</div>
+        <div class="info-value" style="font-size:11px;color:var(--muted)">${ac.remark}</div>
+      </div>` : ''}
+    </div>
+  </div>`;
+}
+
+render();
+
+// ─── FİREBASE ENTEGRASYONU ────────────────────────────────────
+// Strateji: Gömülü veri anında gösterilir, arka planda Firebase
+// kontrol eder. Güncelleme varsa toast ile haber verir.
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, doc, setDoc, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAsmUd--2RURsBSv2qmMiTa0TnIcCmfaEk",
+  authDomain: "mx-hub-36e72.firebaseapp.com",
+  databaseURL: "https://mx-hub-36e72-default-rtdb.firebaseio.com",
+  projectId: "mx-hub-36e72",
+  storageBucket: "mx-hub-36e72.firebasestorage.app",
+  messagingSenderId: "427067393430",
+  appId: "1:427067393430:web:99fd4abe2a0788015889b7"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const db    = getFirestore(fbApp);
+
+// Toast bildirimi
+function showToast(msg, type = 'info') {
+  let toast = document.getElementById('fb-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'fb-toast';
+    toast.style.cssText = `
+      position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px);
+      background:#1a1a1a; border:1px solid #333; color:#e8e8e8;
+      padding:10px 20px; border-radius:4px; font-family:'IBM Plex Mono',monospace;
+      font-size:12px; z-index:999; transition:transform 0.3s; white-space:nowrap;
+      box-shadow:0 4px 20px rgba(0,0,0,0.5);
+    `;
+    document.body.appendChild(toast);
+  }
+  const colors = { info:'#5b9bd5', success:'#4caf7d', warn:'#e8a020', error:'#E31837' };
+  toast.style.borderLeftColor = colors[type] || '#333';
+  toast.style.borderLeftWidth = '3px';
+  toast.textContent = msg;
+  toast.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => {
+    toast.style.transform = 'translateX(-50%) translateY(80px)';
+  }, 3500);
+}
+
+// Firestore'dan filo verisini çek, gömülü veriyle karşılaştır
+async function syncFromFirebase() {
+  try {
+    const snap = await getDocs(collection(db, 'thy_fleet'));
+    if (snap.empty) {
+      // Firestore boş → ilk kez yükle
+      await uploadToFirebase();
+      return;
+    }
+
+    const fbData = snap.docs.map(d => d.data());
+    const fbMap  = Object.fromEntries(fbData.map(a => [a.reg, a]));
+
+    let updated = 0;
+    fbData.forEach(fbAc => {
+      const local = fleetData.find(a => a.reg === fbAc.reg);
+      if (!local) {
+        // Firebase'de yeni uçak var, ekle
+        fleetData.push(fbAc);
+        updated++;
+      } else {
+        // Mevcut uçağı Firebase verisiyle güncelle
+        const changed = ['type','config','delivered','remark','name','age']
+          .some(k => fbAc[k] !== undefined && fbAc[k] !== local[k]);
+        if (changed) {
+          Object.assign(local, fbAc);
+          updated++;
+        }
+      }
+    });
+
+    if (updated > 0) {
+      render();
+      showToast(`✈ ${updated} uçak güncellendi`, 'success');
+    } else {
+      showToast('✓ Filo verisi güncel', 'info');
+    }
+  } catch(e) {
+    // Sessizce geç — gömülü veri zaten gösteriliyor
+    console.warn('Firebase sync:', e.message);
+  }
+}
+
+// Gömülü veriyi Firestore'a yükle (sadece boşsa çalışır)
+async function uploadToFirebase() {
+  try {
+    showToast('⬆ Firestore\'a yükleniyor...', 'warn');
+    let count = 0;
+    for (const ac of fleetData) {
+      if (ac.onOrder || !ac.reg || ac.reg === 'TC-') continue;
+      await setDoc(doc(db, 'thy_fleet', ac.reg.replace('-','')), {
+        ...ac,
+        _updated: serverTimestamp()
+      });
+      count++;
+    }
+    showToast(`✓ ${count} uçak Firestore'a yüklendi`, 'success');
+  } catch(e) {
+    console.warn('Firebase upload:', e.message);
+  }
+}
+
+// Sayfa açılınca arka planda sync — 1sn gecikmeyle (UI önce açılsın)
+setTimeout(syncFromFirebase, 1000);
+</script>
+</body>
+</html>
